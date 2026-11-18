@@ -1,0 +1,88 @@
+        -:    0:Source:tests/test_huffman.c
+        -:    0:Graph:resultados/cobertura/test_huffman.gcno
+        -:    0:Data:resultados/cobertura/test_huffman.gcda
+        -:    0:Runs:1
+        -:    1:#include <assert.h>
+        -:    2:#include <stdlib.h>
+        -:    3:#include <stdint.h>
+        -:    4:#include <stdio.h>
+        -:    5:static int fail_at=-1, allocations;
+function test_malloc called 414457 returned 100% blocks executed 100%
+   414457:    6:static void *test_malloc(size_t n) { return allocations++ == fail_at ? NULL : malloc(n); }
+branch  0 taken 413944 (fallthrough)
+branch  1 taken 513
+function test_calloc called 2798 returned 100% blocks executed 100%
+     2798:    7:static void *test_calloc(size_t n,size_t s) { return allocations++ == fail_at ? NULL : calloc(n,s); }
+branch  0 taken 2795 (fallthrough)
+branch  1 taken 3
+        -:    8:#define malloc test_malloc
+        -:    9:#define calloc test_calloc
+        -:   10:#include "../main/huffman.c"
+        -:   11:#undef malloc
+        -:   12:#undef calloc
+function main called 1 returned 100% blocks executed 84%
+        1:   13:int main(void) {
+        -:   14:    uint8_t data[4096];
+       1*:   15:    assert(executar_tarefa_huffman(NULL,0));
+call    0 returned 1
+branch  1 taken 0 (fallthrough)
+branch  2 taken 1
+call    3 never executed
+       1*:   16:    assert(!executar_tarefa_huffman(NULL,1));
+call    0 returned 1
+branch  1 taken 0 (fallthrough)
+branch  2 taken 1
+call    3 never executed
+        -:   17:#if SIZE_MAX > UINT32_MAX
+       1*:   18:    assert(!executar_tarefa_huffman(data,(size_t)UINT32_MAX+1));
+call    0 returned 1
+branch  1 taken 0 (fallthrough)
+branch  2 taken 1
+call    3 never executed
+        -:   19:#endif
+        1:   20:    memset(data,42,sizeof(data));
+       1*:   21:    assert(executar_tarefa_huffman(data,sizeof(data)));
+call    0 returned 1
+branch  1 taken 0 (fallthrough)
+branch  2 taken 1
+call    3 never executed
+     4097:   22:    for (int i=0;i<4096;i++) data[i]=(uint8_t)i;
+branch  0 taken 4096
+branch  1 taken 1 (fallthrough)
+        1:   23:    allocations=0;
+       1*:   24:    assert(executar_tarefa_huffman(data,sizeof(data)));
+call    0 returned 1
+branch  1 taken 0 (fallthrough)
+branch  2 taken 1
+call    3 never executed
+        1:   25:    int total=allocations;
+      517:   26:    for (int i=0;i<total;i++) {
+branch  0 taken 516
+branch  1 taken 1 (fallthrough)
+      516:   27:        allocations=0; fail_at=i;
+     516*:   28:        assert(!executar_tarefa_huffman(data,sizeof(data)));
+call    0 returned 516
+branch  1 taken 0 (fallthrough)
+branch  2 taken 516
+call    3 never executed
+        -:   29:    }
+        1:   30:    fail_at=-1;
+        1:   31:    srand(42);
+call    0 returned 1
+      587:   32:    for (int n=1;n<=4096;n+=7) {
+branch  0 taken 586
+branch  1 taken 1 (fallthrough)
+  1201007:   33:        for (int i=0;i<n;i++) data[i]=(uint8_t)(rand()%256);
+call    0 returned 1200421
+branch  1 taken 1200421
+branch  2 taken 586 (fallthrough)
+     586*:   34:        assert(executar_tarefa_huffman(data,n));
+call    0 returned 586
+branch  1 taken 0 (fallthrough)
+branch  2 taken 586
+call    3 never executed
+        -:   35:    }
+        1:   36:    puts("OK: empty, invalid, singleton, all symbols, random sizes and all allocation failures");
+call    0 returned 1
+        1:   37:    return 0;
+        -:   38:}

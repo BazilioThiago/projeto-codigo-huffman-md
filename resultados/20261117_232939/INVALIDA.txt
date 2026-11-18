@@ -1,0 +1,1 @@
+Ensaio piloto rejeitado: array 4096 bytes, periodo 15 ms; overflow na etapa 3, ativacao 30. Nao usar nas analises finais. A campanha final usa 1024 bytes e periodo de 30 ms.

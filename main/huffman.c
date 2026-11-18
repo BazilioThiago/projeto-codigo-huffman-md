@@ -82,6 +82,8 @@ static void free_tree(Node *root) {
 }
 
 int executar_tarefa_huffman(const uint8_t *entrada, size_t n) {
+    if (n == 0) return 1;
+    if (!entrada || n > UINT32_MAX) return 0;
     uint32_t freq[256] = {0};
     for (size_t i = 0; i < n; i++) {
         freq[entrada[i]]++;
@@ -100,14 +102,18 @@ int executar_tarefa_huffman(const uint8_t *entrada, size_t n) {
 
     for (int i = 0; i < 256; i++) {
         if (freq[i] > 0) {
-            heap_push(heap, create_node((uint8_t)i, freq[i], NULL, NULL));
+            Node *node = create_node((uint8_t)i, freq[i], NULL, NULL);
+            if (!node) goto fail_heap;
+            heap_push(heap, node);
         }
     }
 
     while (heap->size > 1) {
         Node *left = heap_pop(heap);
         Node *right = heap_pop(heap);
-        heap_push(heap, create_node(0, left->freq + right->freq, left, right));
+        Node *node = create_node(0, left->freq + right->freq, left, right);
+        if (!node) { free_tree(left); free_tree(right); goto fail_heap; }
+        heap_push(heap, node);
     }
 
     Node *root = heap_pop(heap);
@@ -121,6 +127,7 @@ int executar_tarefa_huffman(const uint8_t *entrada, size_t n) {
 
     size_t encoded_bytes = (total_bits + 7) / 8;
     uint8_t *codificado = (uint8_t *)calloc(encoded_bytes, 1);
+    if (!codificado) { free_tree(root); goto fail_heap; }
     size_t bit_pos = 0;
 
     for (size_t i = 0; i < n; i++) {
@@ -135,6 +142,7 @@ int executar_tarefa_huffman(const uint8_t *entrada, size_t n) {
 
     /* 2. Decodificacao */
     uint8_t *decodificado = (uint8_t *)malloc(n);
+    if (!decodificado) { free(codificado); free_tree(root); goto fail_heap; }
     if (!root->left && !root->right) {
         memset(decodificado, root->symbol, n);
     } else {
@@ -161,4 +169,11 @@ int executar_tarefa_huffman(const uint8_t *entrada, size_t n) {
     free(path);
 
     return valido;
+
+fail_heap:
+    while (heap->size) free_tree(heap_pop(heap));
+    free(heap);
+    free(codes);
+    free(path);
+    return 0;
 }

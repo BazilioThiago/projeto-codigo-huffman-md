@@ -1,0 +1,288 @@
+        -:    0:Source:main/huffman.c
+        -:    0:Graph:resultados/cobertura/test_huffman.gcno
+        -:    0:Data:resultados/cobertura/test_huffman.gcda
+        -:    0:Runs:1
+        -:    1:#include "huffman.h"
+        -:    2:#include <stdlib.h>
+        -:    3:#include <string.h>
+        -:    4:
+        -:    5:typedef struct Node {
+        -:    6:    uint8_t symbol;
+        -:    7:    uint32_t freq;
+        -:    8:    struct Node *left;
+        -:    9:    struct Node *right;
+        -:   10:} Node;
+        -:   11:
+        -:   12:typedef struct {
+        -:   13:    Node *data[256];
+        -:   14:    int size;
+        -:   15:} MinHeap;
+        -:   16:
+        -:   17:typedef struct {
+        -:   18:    uint8_t bits[256];
+        -:   19:    int length;
+        -:   20:} HuffmanCode;
+        -:   21:
+function create_node called 412764 returned 100% blocks executed 100%
+   412764:   22:static Node *create_node(uint8_t symbol, uint32_t freq, Node *left, Node *right) {
+   412764:   23:    Node *n = (Node *)malloc(sizeof(Node));
+call    0 returned 412764
+   412764:   24:    if (!n) return NULL;
+branch  0 taken 511 (fallthrough)
+branch  1 taken 412253
+   412253:   25:    n->symbol = symbol;
+   412253:   26:    n->freq = freq;
+   412253:   27:    n->left = left;
+   412253:   28:    n->right = right;
+   412253:   29:    return n;
+        -:   30:}
+        -:   31:
+function heap_push called 412253 returned 100% blocks executed 100%
+   412253:   32:static void heap_push(MinHeap *h, Node *n) {
+   412253:   33:    int i = h->size++;
+   547345:   34:    while (i > 0) {
+branch  0 taken 544001
+branch  1 taken 3344 (fallthrough)
+   544001:   35:        int parent = (i - 1) / 2;
+   544001:   36:        if (h->data[parent]->freq <= n->freq) break;
+branch  0 taken 408909 (fallthrough)
+branch  1 taken 135092
+   135092:   37:        h->data[i] = h->data[parent];
+   135092:   38:        i = parent;
+        -:   39:    }
+   412253:   40:    h->data[i] = n;
+   412253:   41:}
+        -:   42:
+function heap_pop called 412253 returned 100% blocks executed 100%
+   412253:   43:static Node *heap_pop(MinHeap *h) {
+   412253:   44:    Node *min = h->data[0];
+   412253:   45:    Node *last = h->data[--h->size];
+   412253:   46:    int i = 0;
+  2110302:   47:    while (i * 2 + 1 < h->size) {
+branch  0 taken 1866231
+branch  1 taken 244071 (fallthrough)
+  1866231:   48:        int child = i * 2 + 1;
+  1866231:   49:        if (child + 1 < h->size && h->data[child + 1]->freq < h->data[child]->freq) {
+branch  0 taken 1855200 (fallthrough)
+branch  1 taken 11031
+branch  2 taken 780666 (fallthrough)
+branch  3 taken 1074534
+   780666:   50:            child++;
+        -:   51:        }
+  1866231:   52:        if (last->freq <= h->data[child]->freq) break;
+branch  0 taken 168182 (fallthrough)
+branch  1 taken 1698049
+  1698049:   53:        h->data[i] = h->data[child];
+  1698049:   54:        i = child;
+        -:   55:    }
+   412253:   56:    if (h->size > 0) h->data[i] = last;
+branch  0 taken 410565 (fallthrough)
+branch  1 taken 1688
+   412253:   57:    return min;
+        -:   58:}
+        -:   59:
+function build_codes called 281948 returned 100% blocks executed 100%
+   281948:   60:static void build_codes(Node *root, HuffmanCode *codes, uint8_t *path, int depth) {
+   281948:   61:    if (!root->left && !root->right) {
+branch  0 taken 141269 (fallthrough)
+branch  1 taken 140679
+branch  2 taken 141269 (fallthrough)
+branch  3 taken 0
+   141269:   62:        if (depth == 0) {
+branch  0 taken 2 (fallthrough)
+branch  1 taken 141267
+        2:   63:            codes[root->symbol].bits[0] = 0;
+        2:   64:            codes[root->symbol].length = 1;
+        -:   65:        } else {
+   141267:   66:            memcpy(codes[root->symbol].bits, path, depth);
+   141267:   67:            codes[root->symbol].length = depth;
+        -:   68:        }
+   141269:   69:        return;
+        -:   70:    }
+   140679:   71:    path[depth] = 0;
+   140679:   72:    build_codes(root->left, codes, path, depth + 1);
+call    0 returned 140679
+   140679:   73:    path[depth] = 1;
+   140679:   74:    build_codes(root->right, codes, path, depth + 1);
+call    0 returned 140679
+        -:   75:}
+        -:   76:
+function free_tree called 890631 returned 100% blocks executed 100%
+   890631:   77:static void free_tree(Node *root) {
+   890631:   78:    if (!root) return;
+branch  0 taken 478378 (fallthrough)
+branch  1 taken 412253
+   412253:   79:    free_tree(root->left);
+call    0 returned 412253
+   412253:   80:    free_tree(root->right);
+call    0 returned 412253
+   412253:   81:    free(root);
+        -:   82:}
+        -:   83:
+function executar_tarefa_huffman called 1107 returned 100% blocks executed 100%
+     1107:   84:int executar_tarefa_huffman(const uint8_t *entrada, size_t n) {
+     1107:   85:    if (n == 0) return 1;
+branch  0 taken 1 (fallthrough)
+branch  1 taken 1106
+     1106:   86:    if (!entrada || n > UINT32_MAX) return 0;
+branch  0 taken 1105 (fallthrough)
+branch  1 taken 1
+branch  2 taken 1 (fallthrough)
+branch  3 taken 1104
+     1104:   87:    uint32_t freq[256] = {0};
+  3323253:   88:    for (size_t i = 0; i < n; i++) {
+branch  0 taken 3322149
+branch  1 taken 1104 (fallthrough)
+  3322149:   89:        freq[entrada[i]]++;
+        -:   90:    }
+        -:   91:
+     1104:   92:    MinHeap *heap = (MinHeap *)calloc(1, sizeof(MinHeap));
+call    0 returned 1104
+     1104:   93:    HuffmanCode *codes = (HuffmanCode *)calloc(256, sizeof(HuffmanCode));
+call    0 returned 1104
+     1104:   94:    uint8_t *path = (uint8_t *)malloc(256);
+call    0 returned 1104
+        -:   95:
+     1104:   96:    if (!heap || !codes || !path) {
+branch  0 taken 1103 (fallthrough)
+branch  1 taken 1
+branch  2 taken 1102 (fallthrough)
+branch  3 taken 1
+branch  4 taken 1 (fallthrough)
+branch  5 taken 1101
+        3:   97:        free(heap);
+        3:   98:        free(codes);
+        3:   99:        free(path);
+        3:  100:        return 0;
+        -:  101:    }
+        -:  102:
+   250061:  103:    for (int i = 0; i < 256; i++) {
+branch  0 taken 249216
+branch  1 taken 845 (fallthrough)
+   249216:  104:        if (freq[i] > 0) {
+branch  0 taken 239445 (fallthrough)
+branch  1 taken 9771
+   239445:  105:            Node *node = create_node((uint8_t)i, freq[i], NULL, NULL);
+call    0 returned 239445
+   239445:  106:            if (!node) goto fail_heap;
+branch  0 taken 256 (fallthrough)
+branch  1 taken 239189
+   239189:  107:            heap_push(heap, node);
+call    0 returned 239189
+        -:  108:        }
+        -:  109:    }
+        -:  110:
+   173909:  111:    while (heap->size > 1) {
+branch  0 taken 173319
+branch  1 taken 590 (fallthrough)
+   173319:  112:        Node *left = heap_pop(heap);
+call    0 returned 173319
+   173319:  113:        Node *right = heap_pop(heap);
+call    0 returned 173319
+   173319:  114:        Node *node = create_node(0, left->freq + right->freq, left, right);
+call    0 returned 173319
+   173319:  115:        if (!node) { free_tree(left); free_tree(right); goto fail_heap; }
+branch  0 taken 255 (fallthrough)
+branch  1 taken 173064
+call    2 returned 255
+call    3 returned 255
+   173064:  116:        heap_push(heap, node);
+call    0 returned 173064
+        -:  117:    }
+        -:  118:
+      590:  119:    Node *root = heap_pop(heap);
+call    0 returned 590
+      590:  120:    build_codes(root, codes, path, 0);
+call    0 returned 590
+        -:  121:
+        -:  122:    /* 1. Codificacao */
+      590:  123:    size_t total_bits = 0;
+  1217395:  124:    for (size_t i = 0; i < n; i++) {
+branch  0 taken 1216805
+branch  1 taken 590 (fallthrough)
+  1216805:  125:        total_bits += codes[entrada[i]].length;
+        -:  126:    }
+        -:  127:
+      590:  128:    size_t encoded_bytes = (total_bits + 7) / 8;
+      590:  129:    uint8_t *codificado = (uint8_t *)calloc(encoded_bytes, 1);
+call    0 returned 590
+      590:  130:    if (!codificado) { free_tree(root); goto fail_heap; }
+branch  0 taken 1 (fallthrough)
+branch  1 taken 589
+call    2 returned 1
+      589:  131:    size_t bit_pos = 0;
+        -:  132:
+  1213298:  133:    for (size_t i = 0; i < n; i++) {
+branch  0 taken 1212709
+branch  1 taken 589 (fallthrough)
+  1212709:  134:        HuffmanCode *c = &codes[entrada[i]];
+ 10809375:  135:        for (int b = 0; b < c->length; b++) {
+branch  0 taken 9596666
+branch  1 taken 1212709 (fallthrough)
+  9596666:  136:            if (c->bits[b]) {
+branch  0 taken 5003182 (fallthrough)
+branch  1 taken 4593484
+  5003182:  137:                codificado[bit_pos >> 3] |= (uint8_t)(1U << (7 - (bit_pos & 7)));
+        -:  138:            }
+  9596666:  139:            bit_pos++;
+        -:  140:        }
+        -:  141:    }
+        -:  142:
+        -:  143:    /* 2. Decodificacao */
+      589:  144:    uint8_t *decodificado = (uint8_t *)malloc(n);
+call    0 returned 589
+      589:  145:    if (!decodificado) { free(codificado); free_tree(root); goto fail_heap; }
+branch  0 taken 1 (fallthrough)
+branch  1 taken 588
+call    2 returned 1
+      588:  146:    if (!root->left && !root->right) {
+branch  0 taken 2 (fallthrough)
+branch  1 taken 586
+branch  2 taken 2 (fallthrough)
+branch  3 taken 0
+        2:  147:        memset(decodificado, root->symbol, n);
+        -:  148:    } else {
+      586:  149:        Node *curr = root;
+      586:  150:        size_t out_idx = 0;
+  9560387:  151:        for (size_t b = 0; b < total_bits; b++) {
+branch  0 taken 9559801
+branch  1 taken 586 (fallthrough)
+  9559801:  152:            int bit = (codificado[b >> 3] >> (7 - (b & 7))) & 1;
+  9559801:  153:            curr = bit ? curr->right : curr->left;
+branch  0 taken 4986798 (fallthrough)
+branch  1 taken 4573003
+  9559801:  154:            if (!curr->left && !curr->right) {
+branch  0 taken 1204516 (fallthrough)
+branch  1 taken 8355285
+branch  2 taken 1204516 (fallthrough)
+branch  3 taken 0
+  1204516:  155:                decodificado[out_idx++] = curr->symbol;
+  1204516:  156:                curr = root;
+        -:  157:            }
+        -:  158:        }
+        -:  159:    }
+        -:  160:
+        -:  161:    /* 3. Validacao logica */
+      588:  162:    int valido = (memcmp(entrada, decodificado, n) == 0);
+        -:  163:
+      588:  164:    free(codificado);
+      588:  165:    free(decodificado);
+      588:  166:    free_tree(root);
+call    0 returned 588
+      588:  167:    free(heap);
+      588:  168:    free(codes);
+      588:  169:    free(path);
+        -:  170:
+      588:  171:    return valido;
+        -:  172:
+      513:  173:fail_heap:
+    65538:  174:    while (heap->size) free_tree(heap_pop(heap));
+call    0 returned 65025
+call    1 returned 65025
+branch  2 taken 65025
+branch  3 taken 513 (fallthrough)
+      513:  175:    free(heap);
+      513:  176:    free(codes);
+      513:  177:    free(path);
+      513:  178:    return 0;
+        -:  179:}

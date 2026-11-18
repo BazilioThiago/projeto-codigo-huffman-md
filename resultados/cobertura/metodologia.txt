@@ -1,0 +1,5 @@
+GCC/gcov 14.2.0 (MinGW-W64 x86_64-ucrt-posix-seh, CodeBlocks).
+Suite funcional no host, compilacao -O0 --coverage.
+113/113 linhas e 71/74 resultados de desvios em main/huffman.c.
+Tres resultados impossiveis: !left && !right em arvore binaria cheia.
+O firmware usa Xtensa GCC 15.2.0, ESP-IDF v6.1-dirty e -Og, sem gcov.
