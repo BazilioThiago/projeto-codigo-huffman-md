@@ -18,8 +18,6 @@ build/
 *.elf
 *.map
 flasher_args.json # Generated in build directory
-sdkconfig.old
-sdkconfig
 /components/.idf/
 **/components/.idf/
 managed_components/
