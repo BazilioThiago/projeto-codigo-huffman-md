@@ -53,3 +53,13 @@ tools/python_deps/
 *.gcno
 *.gcda
 /tmp/
+
+/.vscode/
+
+# Tentativas incompletas — preservar localmente
+/resultados/20261117_232939/
+/resultados/20261117_233316/
+
+# ZIP de entrega; o conteúdo já está no repositório
+/output/
+/resultados/

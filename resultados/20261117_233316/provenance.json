@@ -1,9 +1,0 @@
-{
-  "sha256": {
-    "main/main.c": "0b8a799a6ff9d8460fcafb75ae120e70ddd905e43f06007e631ba21030d04aca",
-    "main/huffman.c": "b1e60b5c16ce25e7b02354e6cf5ee0d4740180f6ebad727d2d4f66841545779a",
-    "main/huffman.h": "2c209cfac617b6d80598ce3ca01b06d6f31c22f863de74adfe74d1a11abab059",
-    "sdkconfig": "c7aa3416f080a4806390bc1951a72cb9233605852ecbbc62551557fcc899f527",
-    "build/projeto-codigo-huffman-md.bin": "40eb32fb1e412e8ec165457e8508f94898f600f8c0080719ed10b872431ee282"
-  }
-}

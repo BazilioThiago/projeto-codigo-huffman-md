@@ -1,1 +1,0 @@
-Coleta rejeitada: serial.readline retornou uma linha parcial durante transmissao da etapa 4. Apenas 4875 amostras completas dessa etapa chegaram ao log; sem CSV final e sem complete.json. Nao usar nas analises. Firmware atualizado para ceder CPU a cada 100 linhas durante dump; capturador agora acumula fragmentos ate newline e reduz flushes.
