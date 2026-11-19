@@ -1,7 +1,6 @@
 # Medicoes de tempo de resposta: Huffman / ESP32
 
 Thiago Bazilio e Guilherme Santana - Engenharia de Computacao.
-Preencher os numeros de matricula (RAs) antes da entrega.
 
 ## Executar na placa
 
